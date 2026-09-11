@@ -38,6 +38,7 @@ from model.config import (
 )
 from model.llm import (
     ConversationStore,
+    FacilityInfo,
     GemmaReasoner,
     OllamaAnswerer,
     ReasoningParseError,
@@ -50,6 +51,10 @@ from model.translation import IndicTranslator
 logger = logging.getLogger(__name__)
 
 VALID_MODES = {"patient", "asha_worker"}
+VALID_AGE_GROUPS = {"", "unknown", "infant", "child", "adult", "elderly"}
+
+#: Upper bound for /api/speak input (keeps Parler-TTS latency sane).
+MAX_TTS_CHARS = 600
 
 # Unicode script ranges used to guess the language of *typed* text when
 # the caller passes language="auto". Voice auto-detection is handled by
@@ -98,6 +103,30 @@ class PipelineResult:
     is_emergency: bool = False
     function_note: str | None = None
     used_fallback: bool = False
+    facilities: list[dict] = field(default_factory=list)
+
+
+def _format_extra_context(
+    age_group: str | None = None,
+    pregnant: bool | None = None,
+    duration: str | None = None,
+    fever: str | None = None,
+) -> str:
+    """Formats the optional intake details into one English context line
+    for the reasoner (e.g. "Patient context: 3-year-old age group: child;
+    fever: 101F; duration: 2 days"). Returns "" when nothing was given."""
+    bits: list[str] = []
+    if age_group:
+        bits.append(f"age group: {age_group}")
+    if pregnant is True:
+        bits.append("patient is pregnant")
+    elif pregnant is False:
+        bits.append("patient is not pregnant")
+    if duration and duration.strip():
+        bits.append(f"symptom duration: {duration.strip()[:80]}")
+    if fever and fever.strip():
+        bits.append(f"fever/reading: {fever.strip()[:40]}")
+    return ("Patient context: " + "; ".join(bits) + ".") if bits else ""
 
 
 class SanjeevaniPipeline:
@@ -109,6 +138,7 @@ class SanjeevaniPipeline:
         self.translator = IndicTranslator(cfg)
         self.reasoner = GemmaReasoner(cfg)
         self.fallback_answerer = OllamaAnswerer(cfg)
+        self.tts = None  # IndicTTS, created lazily on first /api/speak call
         self.store = ConversationStore(max_turns=cfg.max_history_turns)
 
     # -- public API (called by website/backend/main.py) --------------------
@@ -121,6 +151,10 @@ class SanjeevaniPipeline:
         mode: str = "patient",
         lat: float | None = None,
         lng: float | None = None,
+        age_group: str | None = None,
+        pregnant: bool | None = None,
+        duration: str | None = None,
+        fever: str | None = None,
     ) -> PipelineResult:
         text = (text or "").strip()
         if not text:
@@ -128,6 +162,7 @@ class SanjeevaniPipeline:
         if len(text) > 2000:
             raise ValueError("Text is too long (max 2000 characters).")
         mode = self._validate_mode(mode)
+        age_group = self._validate_age_group(age_group)
         session_id = session_id or self.store.new_session_id()
 
         if language in (None, "", "auto"):
@@ -146,6 +181,7 @@ class SanjeevaniPipeline:
             mode=mode,
             lat=lat,
             lng=lng,
+            extra_context=_format_extra_context(age_group, pregnant, duration, fever),
         )
 
     def process_audio(
@@ -156,10 +192,15 @@ class SanjeevaniPipeline:
         mode: str = "patient",
         lat: float | None = None,
         lng: float | None = None,
+        age_group: str | None = None,
+        pregnant: bool | None = None,
+        duration: str | None = None,
+        fever: str | None = None,
     ) -> PipelineResult:
         if not audio_bytes:
             raise ValueError("Audio data is empty.")
         mode = self._validate_mode(mode)
+        age_group = self._validate_age_group(age_group)
         session_id = session_id or self.store.new_session_id()
 
         if language in (None, "", "auto"):
@@ -184,7 +225,30 @@ class SanjeevaniPipeline:
             mode=mode,
             lat=lat,
             lng=lng,
+            extra_context=_format_extra_context(age_group, pregnant, duration, fever),
         )
+
+    def synthesize_speech(self, text: str) -> tuple[bytes, str]:
+        """Speaks `text` (already in the user's language) via Indic Parler-TTS.
+
+        Returns (wav_bytes, detected_note). Raises ValueError for bad input,
+        RuntimeError when the model fails. The wrapper lazy-loads weights on
+        first call.
+        """
+        text = (text or "").strip()
+        if not text:
+            raise ValueError("Nothing to speak — text is empty.")
+        if len(text) > MAX_TTS_CHARS:
+            raise ValueError(f"Text too long for speech (max {MAX_TTS_CHARS} characters).")
+        if self.tts is None:
+            from model.tts import IndicTTS
+
+            self.tts = IndicTTS(self.cfg)
+        try:
+            wav = self.tts.synthesize(text)
+        except Exception as exc:
+            raise RuntimeError(f"Speech synthesis failed: {exc}") from exc
+        return wav, "indic-parler-tts"
 
     def reset_session(self, session_id: str) -> None:
         self.store.reset(session_id)
@@ -206,6 +270,13 @@ class SanjeevaniPipeline:
             raise ValueError(f"Unsupported mode '{mode}'. Expected one of {sorted(VALID_MODES)}.")
         return mode
 
+    @staticmethod
+    def _validate_age_group(age_group: str | None) -> str:
+        age_group = (age_group or "").strip().lower()
+        if age_group not in VALID_AGE_GROUPS:
+            raise ValueError(f"Unsupported age_group '{age_group}'. Expected one of {sorted(VALID_AGE_GROUPS)}.")
+        return age_group
+
     def _reason_and_respond(
         self,
         *,
@@ -216,13 +287,26 @@ class SanjeevaniPipeline:
         mode: str,
         lat: float | None,
         lng: float | None,
+        extra_context: str = "",
     ) -> PipelineResult:
         lang_info = LANGUAGE_BY_CODE.get(detected_language)
         lang_name = lang_info.name if lang_info else detected_language
         history = self.store.get_history(session_id)
+        # The optional intake details ride along with the query given to the
+        # reasoner (not the stored transcript), so triage can use them.
+        reasoner_query = f"{extra_context}\n{english_text}" if extra_context else english_text
 
         try:
-            extraction = self.reasoner.extract_and_plan(english_text, history=history, mode=mode)
+            extraction = self.reasoner.extract_and_plan(reasoner_query, history=history, mode=mode)
+            contexts = match_topics(extraction.possible_topics) if extraction.possible_topics else []
+            if not contexts:
+                # No Gemma-planned topic matched — try a direct keyword match
+                # on the query itself before giving up on grounding.
+                direct = retrieve_context(reasoner_query)
+                contexts = [direct] if direct.is_grounded else []
+            triage = self.reasoner.clinical_reasoning(
+                reasoner_query, extraction, contexts, history=history, mode=mode
+            )
             contexts = match_topics(extraction.possible_topics) if extraction.possible_topics else []
             if not contexts:
                 # No Gemma-planned topic matched — try a direct keyword match
@@ -243,6 +327,11 @@ class SanjeevaniPipeline:
             is_emergency = triage.triage == "emergency" or (
                 fn_result is not None and fn_result.action == "emergency_escalation"
             )
+            facilities = [
+                {"name": f.name, "lat": f.lat, "lng": f.lng,
+                 "maps_url": f.maps_url, "kind": f.kind}
+                for f in (fn_result.facilities if fn_result else [])
+            ]
 
             answer_en = triage.answer
             result = PipelineResult(
@@ -262,10 +351,11 @@ class SanjeevaniPipeline:
                 is_emergency=is_emergency,
                 function_note=function_note,
                 used_fallback=False,
+                facilities=facilities,
             )
             logger.info(
-                "reasoned session=%s triage=%s grounded=%s action=%s",
-                session_id, triage.triage, is_grounded, triage.next_action,
+                "reasoned session=%s triage=%s grounded=%s action=%s facilities=%d",
+                session_id, triage.triage, is_grounded, triage.next_action, len(facilities),
             )
         except (ReasoningParseError, RuntimeError) as exc:
             logger.warning("Multi-stage reasoning failed (%s); using fallback answerer.", exc)

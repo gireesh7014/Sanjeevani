@@ -6,7 +6,7 @@ grounding, function-calling actions, and session memory.
 from .ollama_client import OllamaAnswerer
 from .reasoning import GemmaReasoner, ExtractionResult, TriageResult, ReasoningParseError
 from .knowledge_base import retrieve_context, match_topics
-from .functions import dispatch as dispatch_function
+from .functions import FacilityInfo, dispatch as dispatch_function
 from .memory import ConversationStore
 
 __all__ = [
@@ -18,5 +18,6 @@ __all__ = [
     "retrieve_context",
     "match_topics",
     "dispatch_function",
+    "FacilityInfo",
     "ConversationStore",
 ]

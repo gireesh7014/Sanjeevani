@@ -387,3 +387,116 @@ a { color: inherit; }
   html { scroll-behavior: auto; }
   .hero-card { animation: none; }
 }
+
+/* ============================================================
+   Sanjeevani — Indian-context additions
+   (seasonal, topics, tools, helplines, facilities, i18n, print)
+   ============================================================ */
+
+.lang-toggle { font-weight: 800; font-size: 13px; width: auto; padding: 0 11px; font-family: var(--font-native); }
+
+/* seasonal advisory card in hero */
+.seasonal-card {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: var(--surface); border: 1px solid var(--gold);
+  border-left: 4px solid var(--gold);
+  border-radius: 14px; padding: 13px 15px; margin-top: 20px;
+  box-shadow: var(--shadow-sm); max-width: 560px;
+}
+.seasonal-card strong { display: block; font-size: 14px; }
+.seasonal-card p { margin: 3px 0 0; font-size: 13px; color: var(--ink-soft); font-family: var(--font-native), var(--font-body); }
+.seasonal-card .btn { margin-left: auto; flex: none; }
+.seasonal-icon { font-size: 24px; }
+
+/* optional intake details */
+.quick-details { border: 1px dashed var(--line); border-radius: 12px; padding: 10px 13px; margin: 0 0 14px; font-size: 13.5px; }
+.quick-details summary { cursor: pointer; font-weight: 700; color: var(--ink-soft); }
+.quick-details summary:hover { color: var(--ink); }
+.details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.details-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); }
+.details-grid input, .details-grid select {
+  border: 1.5px solid var(--line); border-radius: 9px; padding: 9px 10px;
+  font-family: var(--font-body); font-size: 13.5px; background: var(--surface); color: var(--ink);
+}
+.details-grid input:focus, .details-grid select:focus { border-color: var(--gold); outline: none; }
+.check-label { flex-direction: row !important; align-items: center; gap: 8px !important; }
+.check-label input { width: 18px; height: 18px; accent-color: var(--teal, #0b2b28); }
+
+/* facilities card inside an answer */
+.facility-card { border: 1px solid var(--green, #1c7a4d); border-radius: 12px; padding: 12px 14px; margin: 10px 0 4px; background: var(--surface); }
+.facility-card h4 { margin: 0 0 8px; font-size: 13.5px; }
+.facility-card ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.facility-card li { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13.5px; }
+.facility-card .kind { font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); display: block; }
+.dir-btn { font-size: 12px; font-weight: 700; color: var(--green, #1c7a4d); text-decoration: none; border: 1px solid currentColor; border-radius: 999px; padding: 4px 11px; white-space: nowrap; }
+.audio-player { width: 100%; margin-top: 8px; }
+.mini-btn.is-loading { opacity: .6; pointer-events: none; }
+
+/* topics grid */
+.topics { padding: 34px 24px 6px; }
+.topics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 22px; }
+.topic-card { display: flex; gap: 11px; align-items: center; text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; padding: 14px 15px; cursor: pointer; font-family: var(--font-body); color: var(--ink); transition: transform .15s, border-color .2s, box-shadow .2s; }
+.topic-card:hover { transform: translateY(-3px); border-color: var(--gold); box-shadow: var(--shadow-sm); }
+.topic-icon { font-size: 26px; }
+.topic-card b { display: block; font-size: 14px; }
+.topic-card span { font-size: 12.5px; color: var(--ink-soft); font-family: var(--font-native); }
+
+/* tools */
+.tools { padding: 40px 24px 6px; }
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin-top: 22px; }
+.tool-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm); }
+.tool-card h3 { margin: 0 0 4px; font-size: 17px; font-family: var(--font-display); }
+.tool-card h3 small { font-family: var(--font-body); font-size: 11.5px; color: var(--ink-faint); font-weight: 600; }
+.tool-sub { font-size: 13px; color: var(--ink-soft); margin: 0 0 12px; }
+.tool-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 12px; }
+.tool-row label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 600; color: var(--ink-soft); flex: 1; min-width: 110px; }
+.tool-row input { border: 1.5px solid var(--line); border-radius: 9px; padding: 9px 10px; font-size: 14px; background: var(--surface); color: var(--ink); font-family: var(--font-body); }
+.tool-out { font-size: 13.5px; margin: 12px 0 0; white-space: pre-line; }
+.tool-wide { grid-column: 1 / -1; }
+.ors-list { margin: 10px 0 0; padding-left: 20px; font-size: 13px; color: var(--ink-soft); }
+.ors-list li { margin-bottom: 5px; }
+.teeka-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-top: 12px; max-height: 300px; overflow-y: auto; }
+.teeka-dose { border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; font-size: 12.5px; }
+.teeka-dose b { display: block; font-size: 13px; }
+.teeka-dose .due { color: var(--ink-faint); font-family: var(--font-mono); font-size: 11px; }
+.teeka-dose.st-overdue { border-left: 4px solid var(--brick); }
+.teeka-dose.st-due_today { border-left: 4px solid var(--gold); background: var(--gold-soft); }
+.teeka-dose.st-upcoming { border-left: 4px solid var(--green, #1c7a4d); }
+.teeka-pill { float: right; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.st-overdue .teeka-pill { color: var(--brick); }
+.st-due_today .teeka-pill { color: var(--gold-deep); }
+.st-upcoming .teeka-pill { color: var(--green, #1c7a4d); }
+
+/* helplines + schemes */
+.helplines { padding: 40px 24px 10px; }
+.help-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 22px; }
+.help-card { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; text-decoration: none; transition: transform .15s, border-color .2s; }
+.help-card:hover { transform: translateY(-3px); border-color: var(--brick); }
+.help-num { font-family: var(--font-mono); font-size: 26px; font-weight: 600; color: var(--brick); }
+.help-card b { display: block; font-size: 14px; margin-top: 2px; }
+.help-card .hi { font-family: var(--font-native); font-size: 12.5px; color: var(--ink-soft); }
+.help-card small { display: block; font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.schemes-title { font-family: var(--font-display); font-size: 20px; margin: 28px 0 4px; }
+.schemes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-top: 12px; }
+.scheme-card { background: var(--teal-soft); border-radius: 14px; padding: 16px 17px; }
+.scheme-card b { font-size: 14.5px; display: block; }
+.scheme-card .hi { font-family: var(--font-native); font-size: 12.5px; color: var(--ink-soft); }
+.scheme-card p { font-size: 13px; color: var(--ink-soft); margin: 8px 0 0; }
+
+/* print: only the referral slip */
+#print-area { display: none; }
+@media print {
+  body > *:not(#print-area) { display: none !important; }
+  #print-area { display: block !important; color: #000; }
+  .parchi { border: 2px solid #000; border-radius: 8px; padding: 22px; font-family: sans-serif; max-width: 640px; margin: 0 auto; }
+  .parchi h1 { font-size: 20px; margin: 0 0 2px; }
+  .parchi table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  .parchi td, .parchi th { border: 1px solid #555; padding: 6px 9px; text-align: left; }
+  .parchi .sign { display: flex; justify-content: space-between; margin-top: 34px; font-size: 13px; }
+}
+
+@media (max-width: 760px) {
+  .details-grid { grid-template-columns: 1fr; }
+  .seasonal-card { flex-direction: column; }
+  .seasonal-card .btn { margin-left: 0; }
+}

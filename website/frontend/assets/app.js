@@ -9,11 +9,24 @@
   const els = {
     backendPill: $("backend-pill"), backendText: $("backend-text"),
     themeToggle: $("theme-toggle"), iconMoon: $("theme-icon-moon"), iconSun: $("theme-icon-sun"),
+    langToggle: $("lang-toggle"), langToggleLabel: $("lang-toggle-label"),
     navToggle: $("nav-toggle"), mobileNav: $("mobile-nav"),
     heroTry: $("hero-try-text"), ecg: $("hero-ecg-path"),
+    seasonalCard: $("seasonal-card"), seasonalTitle: $("seasonal-title"),
+    seasonalBody: $("seasonal-body"), seasonalAsk: $("seasonal-ask"),
     slipTimestamp: $("slip-timestamp"), sessionChip: $("session-chip"), footerMeta: $("footer-meta"),
     personaPatient: $("persona-patient"), personaAsha: $("persona-asha"), personaHint: $("persona-hint"),
     langSelect: $("lang-select"), langGrid: $("lang-grid"),
+    ageGroup: $("age-group"), pregnantCheck: $("pregnant-check"),
+    durationInput: $("duration-input"), feverInput: $("fever-input"),
+    topicsGrid: $("topics-grid"),
+    bmiWeight: $("bmi-weight"), bmiHeight: $("bmi-height"),
+    bmiGo: $("bmi-go"), bmiOut: $("bmi-out"),
+    eddLmp: $("edd-lmp"), eddGo: $("edd-go"), eddOut: $("edd-out"),
+    teekaDob: $("teeka-dob"), teekaGo: $("teeka-go"),
+    teekaSummary: $("teeka-summary"), teekaOut: $("teeka-out"),
+    helplinesGrid: $("helplines-grid"), schemesGrid: $("schemes-grid"),
+    parchiBtn: $("parchi-btn"),
     modeSpeak: $("mode-speak"), modeType: $("mode-type"),
     panelSpeak: $("panel-speak"), panelType: $("panel-type"), recTimer: $("rec-timer"),
     recordBtn: $("record-btn"), recordLabel: $("record-label"), recordSub: $("record-sub"),
@@ -66,6 +79,55 @@
     setTheme(saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
     els.themeToggle.addEventListener("click", () =>
       setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+  }
+
+  /* ---------- Hindi/English UI toggle ---------- */
+  const I18N = {
+    en: {
+      nav_consult: "Consult", nav_topics: "Topics", nav_tools: "Sehat tools",
+      nav_help: "Helplines", nav_how: "How it works", nav_cta: "Start consult",
+      hero_eyebrow: "Live prototype · AI4Bharat + Gemma 4 + WHO grounding",
+      hero_title: 'बोलिए.<br /><span class="gradient-text">Understand your health</span> in your own language.',
+      hero_sub: "Speak or type how you feel in any of 13 Indian languages. Sanjeevani transcribes, translates, triages gently, and explains in plain words — with WHO sources when they match.",
+      cta_speak: "Speak now", cta_sample: "Try a sample question",
+      consult_kicker: "Consultation · परामर्श", consult_title: "Describe how you're feeling",
+      consult_sub: "Your conversation stays in this browser session. Reset anytime.",
+      label_lang: "Language · भाषा", details_title: "＋ Thoda vivaran (optional) — age, pregnancy, duration",
+      ask_btn: "Ask Sanjeevani",
+    },
+    hi: {
+      nav_consult: "परामर्श", nav_topics: "विषय", nav_tools: "सेहत उपकरण",
+      nav_help: "हेल्पलाइन", nav_how: "यह कैसे काम करता है", nav_cta: "परामर्श शुरू करें",
+      hero_eyebrow: "लाइव प्रोटोटाइप · AI4Bharat + Gemma 4 + WHO आधार",
+      hero_title: 'बोलिए.<br /><span class="gradient-text">अपना स्वास्थ्य समझिए</span> अपनी भाषा में।',
+      hero_sub: "13 भारतीय भाषाओं में बोलकर या लिखकर बताइए। संजीवनी सुनती है, अनुवाद करती है, और सरल शब्दों में समझाती है — WHO स्रोतों के साथ, जहाँ मिले।",
+      cta_speak: "अभी बोलें", cta_sample: "नमूना प्रश्न आज़माएँ",
+      consult_kicker: "परामर्श · Consultation", consult_title: "आपको कैसा लग रहा है, बताइए",
+      consult_sub: "आपकी बातचीत इसी ब्राउज़र में रहती है। कभी भी नई शुरुआत करें।",
+      label_lang: "भाषा · Language", details_title: "＋ थोड़ा विवरण (वैकल्पिक) — उम्र, गर्भावस्था, अवधि",
+      ask_btn: "संजीवनी से पूछें",
+    },
+  };
+  function setUiLang(next) {
+    const dict = I18N[next] || I18N.en;
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const v = dict[el.dataset.i18n];
+      if (v !== undefined) el.innerHTML = v;
+    });
+    els.langToggleLabel.textContent = next === "hi" ? "EN" : "हिं";
+    els.langToggle.setAttribute("aria-label", next === "hi" ? "Switch to English" : "हिंदी में बदलें");
+    try { localStorage.setItem("sanjeevani-ui-lang", next); } catch {}
+    document.documentElement.lang = next === "hi" ? "hi" : "en";
+  }
+  function initUiLang() {
+    let saved = null;
+    try { saved = localStorage.getItem("sanjeevani-ui-lang"); } catch {}
+    setUiLang(saved || "en");
+    els.langToggle.addEventListener("click", () => {
+      const cur = document.documentElement.lang === "hi" ? "hi" : "en";
+      setUiLang(cur === "hi" ? "en" : "hi");
+      loadSeasonal();
+    });
   }
 
   /* ---------- backend health ---------- */
@@ -136,6 +198,10 @@
     els.personaHint.textContent = isPatient
       ? "Plain, reassuring explanations with next steps."
       : "ASHA mode: red-flag checklist + referral guidance, slightly more clinical.";
+    updateParchiBtn();
+  }
+  function updateParchiBtn() {
+    els.parchiBtn.classList.toggle("hidden", persona !== "asha_worker" || turns.length === 0);
   }
   function setMode(next) {
     mode = next;
@@ -264,9 +330,22 @@
   }
 
   /* ---------- submit ---------- */
+  function extraDetails() {
+    const age = els.ageGroup.value || null;
+    const checked = els.pregnantCheck.checked;
+    return {
+      age_group: age,
+      // Only send pregnancy info when the box state is meaningful: checked
+      // means yes; unchecked + ASHA mode still sends explicit no, otherwise omit.
+      pregnant: checked ? true : (persona === "asha_worker" ? false : null),
+      duration: els.durationInput.value.trim() || null,
+      fever: els.feverInput.value.trim() || null,
+    };
+  }
   async function submit() {
     if (sending) return;
     const language = els.langSelect.value;
+    const extra = extraDetails();
     setLoading(true);
     try {
       let response;
@@ -279,6 +358,10 @@
         if (sessionId) form.append("session_id", sessionId);
         if (userLat !== null) form.append("lat", String(userLat));
         if (userLng !== null) form.append("lng", String(userLng));
+        if (extra.age_group) form.append("age_group", extra.age_group);
+        if (extra.pregnant !== null) form.append("pregnant", String(extra.pregnant));
+        if (extra.duration) form.append("duration", extra.duration);
+        if (extra.fever) form.append("fever", extra.fever);
         response = await fetch(`${API_BASE}/api/ask/audio`, { method: "POST", body: form });
       } else {
         const text = els.textInput.value.trim();
@@ -286,7 +369,9 @@
         response = await fetch(`${API_BASE}/api/ask/text`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, language, session_id: sessionId, mode: persona, lat: userLat, lng: userLng }),
+          body: JSON.stringify({ text, language, session_id: sessionId, mode: persona,
+            lat: userLat, lng: userLng, age_group: extra.age_group,
+            pregnant: extra.pregnant, duration: extra.duration, fever: extra.fever }),
         });
       }
       if (!response.ok) {
@@ -322,6 +407,7 @@
     els.memoryNote.classList.remove("hidden");
     els.downloadBtn.disabled = false;
     els.copyAllBtn.disabled = false;
+    updateParchiBtn();
     // emergency
     const em = !!data.is_emergency;
     els.emergencyBanner.classList.toggle("hidden", !em);
@@ -359,6 +445,13 @@
     const fnote = data.function_note && !data.is_emergency ? `<p class="msg-detail">ℹ <b>Note:</b> ${esc(stripHtml(data.function_note))}</p>` : "";
     const fallback = data.used_fallback ? `<p class="msg-detail">⚠ Answered in safe fallback mode — structured triage unavailable for this reply.</p>` : "";
     const answer = data.native_answer || data.answer || "No answer returned.";
+    const facs = (data.facilities || []).map((f) => {
+      const maps = f.maps_url
+        ? `<a class="dir-btn" href="${esc(f.maps_url)}" target="_blank" rel="noopener">Directions →</a>` : "";
+      return `<li><div><b>${esc(f.name)}</b><span class="kind">${esc(f.kind || "hospital")} · OpenStreetMap</span></div>${maps}</li>`;
+    }).join("");
+    const facCard = facs
+      ? `<div class="facility-card"><h4>🏥 Nearby hospitals / clinics — नज़दीकी अस्पताल</h4><ul>${facs}</ul></div>` : "";
 
     wrap.innerHTML = `
       <div class="msg-ai">
@@ -372,6 +465,7 @@
         ${flags ? `<div class="msg-flags"><b style="font-size:12px;color:var(--ink-faint)">Watch for:</b> ${flags}</div>` : ""}
         ${fnote}${fallback}
         ${srcs ? `<p class="msg-sources"><b>Source:</b> ${srcs}</p>` : ""}
+        ${facCard}
         <button class="msg-toggle" data-act="toggle">Show transcript + English translation ▾</button>
         <div class="msg-hidden hidden">
           <p class="msg-original"></p>
@@ -379,8 +473,10 @@
         </div>
         <div class="msg-actions">
           <button class="mini-btn" data-act="copy">⧉ Copy answer</button>
-          <button class="mini-btn" data-act="listen">▶ Listen</button>
+          <button class="mini-btn" data-act="speak">🔊 Suno jawab</button>
+          <button class="mini-btn" data-act="listen">▶ Browser voice</button>
         </div>
+        <audio class="audio-player hidden" controls></audio>
       </div>`;
     wrap.querySelector(".msg-answer").textContent = answer;
     wrap.querySelector(".msg-original").textContent = `Heard (${data.detected_language_name || "?"}): ${data.transcript || "—"}`;
@@ -398,6 +494,8 @@
         navigator.clipboard.writeText(answer).then(
           () => toast("Answer copied.", "success", 2000),
           () => toast("Copy failed in this browser.", "error"));
+      } else if (act === "speak") {
+        speakViaBackend(answer, btn, wrap.querySelector(".audio-player"));
       } else if (act === "listen") {
         speak(answer, btn);
       }
@@ -416,6 +514,200 @@
     if (btn && btn.textContent === "■ Stop") btn.onclick = () => speechSynthesis.cancel();
   }
 
+  /* ---------- spoken answers (Indic Parler-TTS, browser fallback) ---------- */
+  async function speakViaBackend(text, btn, audioEl) {
+    const clip = text.slice(0, 600);
+    btn.classList.add("is-loading");
+    const orig = btn.textContent;
+    btn.textContent = "…bol rahe hain";
+    try {
+      const res = await fetch(`${API_BASE}/api/speak`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: clip }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      audioEl.src = URL.createObjectURL(blob);
+      audioEl.classList.remove("hidden");
+      audioEl.play().catch(() => {});
+      toast("🔊 Suniye — jawab sunaya ja raha hai.", "success", 2500);
+    } catch {
+      toast("Server voice unavailable — using browser voice.", "error", 3000);
+      speak(text, btn);
+    } finally {
+      btn.classList.remove("is-loading");
+      btn.textContent = orig;
+    }
+  }
+
+  /* ---------- India features: seasonal, topics, helplines, tools ---------- */
+  async function loadSeasonal() {
+    try {
+      const res = await fetch(`${API_BASE}/api/seasonal`);
+      if (!res.ok) throw new Error();
+      const s = await res.json();
+      const hi = document.documentElement.lang === "hi";
+      els.seasonalTitle.textContent = (hi ? s.title_hi : s.title) + ` · ${s.months}`;
+      els.seasonalBody.textContent = hi ? s.body_hi : s.body;
+      els.seasonalCard.classList.remove("hidden");
+      els.seasonalAsk.onclick = () => {
+        setMode("type");
+        els.textInput.value = s.ask;
+        els.charCount.textContent = String(s.ask.length);
+        updateSubmitState();
+        document.getElementById("consult").scrollIntoView({ behavior: "smooth" });
+      };
+    } catch { /* advisory is optional; stay hidden offline */ }
+  }
+
+  async function loadTopics() {
+    try {
+      const res = await fetch(`${API_BASE}/api/topics`);
+      if (!res.ok) throw new Error();
+      const topics = await res.json();
+      els.topicsGrid.innerHTML = "";
+      for (const t of topics) {
+        const b = document.createElement("button");
+        b.className = "topic-card";
+        b.innerHTML = `<span class="topic-icon"></span><div><b></b><span></span></div>`;
+        b.querySelector(".topic-icon").textContent = t.icon;
+        b.querySelector("b").textContent = t.label;
+        b.querySelector("span").textContent = t.label_hi;
+        b.addEventListener("click", () => {
+          setMode("type");
+          els.textInput.value = t.question;
+          els.charCount.textContent = String(t.question.length);
+          updateSubmitState();
+          document.getElementById("consult").scrollIntoView({ behavior: "smooth" });
+          els.textInput.focus({ preventScroll: true });
+        });
+        els.topicsGrid.appendChild(b);
+      }
+    } catch {
+      els.topicsGrid.innerHTML = `<p style="color:var(--ink-faint);font-size:14px">Topics unavailable — is the backend running?</p>`;
+    }
+  }
+
+  async function loadHelplines() {
+    try {
+      const [hRes, sRes] = await Promise.all([
+        fetch(`${API_BASE}/api/helplines`), fetch(`${API_BASE}/api/schemes`),
+      ]);
+      if (hRes.ok) {
+        const list = await hRes.json();
+        els.helplinesGrid.innerHTML = "";
+        for (const h of list) {
+          const a = document.createElement("a");
+          a.className = "help-card";
+          a.href = h.tel;
+          a.innerHTML = `<div class="help-num"></div><b></b><div class="hi"></div><small></small>`;
+          a.querySelector(".help-num").textContent = h.number;
+          a.querySelector("b").textContent = h.name;
+          a.querySelector(".hi").textContent = h.name_hi;
+          a.querySelector("small").textContent = `${h.desc} ${h.hours}`;
+          els.helplinesGrid.appendChild(a);
+        }
+      }
+      if (sRes.ok) {
+        const schemes = await sRes.json();
+        els.schemesGrid.innerHTML = "";
+        for (const s of schemes) {
+          const d = document.createElement("div");
+          d.className = "scheme-card";
+          d.innerHTML = `<b></b><div class="hi"></div><p></p>`;
+          d.querySelector("b").textContent = s.name;
+          d.querySelector(".hi").textContent = s.name_hi;
+          d.querySelector("p").textContent = s.body;
+          els.schemesGrid.appendChild(d);
+        }
+      }
+    } catch {
+      els.helplinesGrid.innerHTML = `<p style="color:var(--ink-faint);font-size:14px">Emergency? Call <a href="tel:108"><b>108</b></a> now.</p>`;
+    }
+  }
+
+  function calcBmi() {
+    const w = parseFloat(els.bmiWeight.value), h = parseFloat(els.bmiHeight.value);
+    if (!w || !h || w <= 0 || h <= 0) { els.bmiOut.textContent = "Vajan aur lambai likhen."; return; }
+    const bmi = w / Math.pow(h / 100, 2);
+    // WHO Asian / Indian cut-offs
+    const cat = bmi < 18.5 ? "Underweight — poshan par dhyan den" :
+      bmi < 23 ? "Normal — badhai! Aise hi rakhen" :
+      bmi < 25 ? "Overweight — tel-namak-meetha kam karen" :
+      "Obese — doctor/ANM se salah len";
+    els.bmiOut.textContent = `BMI: ${bmi.toFixed(1)}\n${cat}\n(Asian cut-off: 23+ adhik vajan)`;
+  }
+
+  function calcEdd() {
+    if (!els.eddLmp.value) { els.eddOut.textContent = "LMP date chunen."; return; }
+    const lmp = new Date(els.eddLmp.value + "T00:00:00");
+    if (isNaN(lmp)) { els.eddOut.textContent = "Sahi date chunen."; return; }
+    const edd = new Date(lmp.getTime() + 280 * 864e5);
+    const now = new Date();
+    const weeks = Math.floor((now - lmp) / 864e5 / 7);
+    const tri = weeks < 0 ? "—" : weeks < 13 ? "1st trimester" : weeks < 27 ? "2nd trimester" : "3rd trimester";
+    els.eddOut.textContent =
+      `Due date: ${edd.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}\n` +
+      (weeks >= 0 ? `Abhi: ~${weeks} hafte · ${tri}\n` : "") +
+      "4 ANC jaanch + 180 IFA goliyan + 2 TT/Td teeke — ASHA se sampark rakhen.";
+  }
+
+  async function checkTeeka() {
+    if (!els.teekaDob.value) { els.teekaSummary.textContent = "Janm-tithi chunen."; return; }
+    els.teekaSummary.textContent = "Dekh rahe hain…";
+    try {
+      const res = await fetch(`${API_BASE}/api/immunization?birthdate=${els.teekaDob.value}`);
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        throw new Error(e.detail || "Check failed");
+      }
+      const data = await res.json();
+      const c = data.counts;
+      els.teekaSummary.textContent =
+        `Umra: ${data.age_label} · ⏰ Due: ${c.due_today} · ⚠ Chhoote: ${c.overdue} · 🔜 Aane wale: ${c.upcoming}`;
+      els.teekaOut.innerHTML = "";
+      const pill = { overdue: "chhoota", due_today: "abhi", upcoming: "aane wala" };
+      for (const d of data.doses) {
+        const div = document.createElement("div");
+        div.className = `teeka-dose st-${d.status}`;
+        div.innerHTML = `<span class="teeka-pill"></span><b></b><span class="due"></span>`;
+        div.querySelector(".teeka-pill").textContent = pill[d.status] || d.status;
+        div.querySelector("b").textContent = `${d.name} · ${d.name_hi}`;
+        div.querySelector(".due").textContent = `${d.due_label} · ${d.due_date}${d.note ? " · " + d.note : ""}`;
+        els.teekaOut.appendChild(div);
+      }
+    } catch (err) {
+      els.teekaSummary.textContent = err.message || "Check failed.";
+    }
+  }
+
+  /* ---------- ASHA referral parchi (print) ---------- */
+  function printParchi() {
+    const last = turns[turns.length - 1];
+    if (!last) { toast("Pehle ek prashn puchhen.", "error"); return; }
+    const d = new Date().toLocaleString("en-IN");
+    const facRows = (last.facilities || []).map((f) =>
+      `<tr><td>${esc(f.name)}</td><td>${esc(f.kind || "")}</td><td>${f.maps_url ? "Maps link attached" : "—"}</td></tr>`).join("");
+    const area = document.getElementById("print-area");
+    area.innerHTML = `
+      <div class="parchi">
+        <h1>संजीवनी — Referral Parchi (ASHA)</h1>
+        <p>General information slip — NOT a prescription. Diagnosis only by a registered doctor.</p>
+        <table>
+          <tr><th>Date</th><td>${esc(d)}</td></tr>
+          <tr><th>Heard (${esc(last.detected_language_name || "")})</th><td>${esc(last.transcript)}</td></tr>
+          <tr><th>Triage</th><td><b>${esc(last.triage)}</b> (${Math.round((last.confidence || 0) * 100)}%)</td></tr>
+          <tr><th>Possible</th><td>${esc((last.possible_conditions || []).join(", ") || "—")}</td></tr>
+          <tr><th>Red flags</th><td>${esc((last.red_flags || []).join(", ") || "—")}</td></tr>
+          <tr><th>Advice (native)</th><td>${esc(last.native_answer || last.answer)}</td></tr>
+          <tr><th>Sources</th><td>${esc((last.sources || []).join(", ") || "—")}</td></tr>
+        </table>
+        ${facRows ? `<h3>Nearby facilities</h3><table>${facRows}</table>` : "<p>Emergency? Call <b>108</b>.</p>"}
+        <div class="sign"><span>ASHA signature: ________</span><span>ANM/MO signature: ________</span></div>
+      </div>`;
+    window.print();
+  }
+
   /* ---------- export / reset ---------- */
   function downloadSummary() {
     if (!turns.length) return;
@@ -429,6 +721,7 @@
       if (d.red_flags?.length) lines.push(`Red flags: ${d.red_flags.join("; ")}`);
       lines.push(`Answer: ${d.native_answer || d.answer}`);
       if (d.sources?.length) lines.push(`Sources: ${d.sources.join(", ")}`);
+      if (d.facilities?.length) lines.push(`Nearby: ${d.facilities.map((f) => f.name).join("; ")}`);
       lines.push(``);
     });
     lines.push(`Disclaimer: general information only — not a diagnosis. Emergency? Call 108.`);
@@ -457,6 +750,11 @@
     els.footerMeta.textContent = "session · new";
     els.downloadBtn.disabled = true;
     els.copyAllBtn.disabled = true;
+    updateParchiBtn();
+    els.ageGroup.value = "";
+    els.pregnantCheck.checked = false;
+    els.durationInput.value = "";
+    els.feverInput.value = "";
     recordedBlob = null; recordedChunks = [];
     els.audioPreview.classList.add("hidden");
     els.discardAudio.classList.add("hidden");
@@ -472,9 +770,22 @@
   /* ---------- init ---------- */
   function init() {
     initTheme();
+    initUiLang();
     checkHealth();
     loadLanguages();
+    loadSeasonal();
+    loadTopics();
+    loadHelplines();
     drawVisualizer();
+    if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
+    }
+    els.bmiGo.addEventListener("click", calcBmi);
+    els.eddGo.addEventListener("click", calcEdd);
+    els.teekaGo.addEventListener("click", checkTeeka);
+    els.parchiBtn.addEventListener("click", printParchi);
 
     els.personaPatient.addEventListener("click", () => setPersona("patient"));
     els.personaAsha.addEventListener("click", () => setPersona("asha_worker"));

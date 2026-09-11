@@ -20,13 +20,25 @@ Only two actions exist right now, both intentionally simple:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+
+@dataclass
+class FacilityInfo:
+    """One nearby health facility, structured for the frontend card."""
+
+    name: str
+    lat: float | None = None
+    lng: float | None = None
+    maps_url: str | None = None
+    kind: str = "hospital"  # hospital | clinic
 
 
 @dataclass
 class FunctionCallResult:
     action: str
     note: str
+    facilities: list[FacilityInfo] = field(default_factory=list)
 
 
 def emergency_escalation() -> FunctionCallResult:
@@ -70,16 +82,26 @@ def find_nearest_hospital(speciality: str = "General Medicine", lat: float | Non
                 note="I couldn't find any hospitals within 10km of your location using OpenStreetMap. Please call 108 in an emergency."
             )
             
-        note = "Here are the nearest facilities I found (click for Google Maps directions):<br><ul style='margin-top: 8px; padding-left: 20px;'>"
-        for i, el in enumerate(elements[:5], 1):
-            name = el.get("tags", {}).get("name", "Medical Facility")
-            h_lat = el.get("lat")
-            h_lon = el.get("lon")
-            maps_link = f"https://www.google.com/maps/dir/?api=1&destination={h_lat},{h_lon}"
-            note += f"<li><a href='{maps_link}' target='_blank' rel='noopener' style='text-decoration: underline; color: var(--teal);'>{name}</a></li>"
-            
-        note += "</ul>"
-        return FunctionCallResult(action="find_nearest_hospital", note=note)
+        facilities: list[FacilityInfo] = []
+        for el in elements[:5]:
+            tags = el.get("tags", {})
+            h_lat, h_lon = el.get("lat"), el.get("lon")
+            maps_link = (
+                f"https://www.google.com/maps/dir/?api=1&destination={h_lat},{h_lon}"
+                if h_lat is not None and h_lon is not None else None
+            )
+            facilities.append(FacilityInfo(
+                name=tags.get("name", "Medical Facility"),
+                lat=h_lat, lng=h_lon, maps_url=maps_link,
+                kind="clinic" if tags.get("amenity") == "clinic" else "hospital",
+            ))
+
+        names = ", ".join(f.name for f in facilities[:3])
+        note = (
+            f"Nearest facilities from OpenStreetMap (within 10 km): {names}. "
+            "Open the list below for directions."
+        )
+        return FunctionCallResult(action="find_nearest_hospital", note=note, facilities=facilities)
         
     except Exception as exc:
         return FunctionCallResult(
