@@ -1,227 +1,404 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sanjeevani — Speak in your language. Understand your health.</title>
-<meta name="description" content="Sanjeevani listens in your language and helps you understand your health, in plain words." />
+<meta name="description" content="Sanjeevani listens in your language and explains health in plain words. Voice + text, 13 Indian languages, WHO-grounded answers." />
+<meta name="theme-color" content="#0b2b28" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b2b28'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23f2b544' font-family='serif' font-weight='bold'%3E%E0%A4%B8%3C/text%3E%3C/svg%3E" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Bengali:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&family=Noto+Sans+Gujarati:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Malayalam:wght@400;600&family=Noto+Sans+Gurmukhi:wght@400;600&family=Noto+Sans+Oriya:wght@400;600&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&family=Noto+Sans+Gujarati:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Malayalam:wght@400;600&family=Noto+Sans+Gurmukhi:wght@400;600&family=Noto+Sans+Oriya:wght@400;600&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet" />
 
 <link rel="stylesheet" href="/assets/style.css" />
 </head>
 <body>
 
-<div class="pulse-rail" aria-hidden="true">
-  <svg viewBox="0 0 1200 40" preserveAspectRatio="none" class="pulse-svg">
-    <path id="pulse-path" d="M0,20 L1200,20" />
-  </svg>
+<a class="skip-link" href="#consult">Skip to consultation</a>
+
+<!-- Emergency strip -->
+<div class="emergency-strip" role="note" aria-label="Emergency notice">
+  <span class="emergency-strip-dot" aria-hidden="true"></span>
+  <p>Medical emergency? Call <a href="tel:108"><strong>108</strong></a> now — Sanjeevani is information only, not a diagnosis.</p>
 </div>
 
-<header class="site-header">
-  <div class="wrap header-row">
-    <div class="wordmark">
-      <span class="wordmark-mark">स</span>
-      <span class="wordmark-text">Sanjeevani</span>
-    </div>
-    <nav class="header-nav">
-      <a href="#how-it-works">How it works</a>
-      <a href="#about">About this build</a>
+<!-- Header -->
+<header class="site-header" id="top">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top" aria-label="Sanjeevani home">
+      <span class="brand-mark" aria-hidden="true">स</span>
+      <span class="brand-text">Sanjeevani<small>स्वास्थ्य · आपकी भाषा में</small></span>
+    </a>
+    <nav class="header-nav" aria-label="Primary">
+      <a href="#consult">Consult</a>
+      <a href="#how">How it works</a>
+      <a href="#languages">Languages</a>
+      <a href="#safety">Safety</a>
+      <a href="#faq">FAQ</a>
     </nav>
+    <div class="header-actions">
+      <span class="backend-pill" id="backend-pill" role="status" aria-live="polite">
+        <span class="pill-dot" id="backend-dot"></span>
+        <span id="backend-text">Checking…</span>
+      </span>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg id="theme-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+        <svg id="theme-icon-sun" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a href="#consult" class="btn btn-primary btn-sm">Start consult</a>
+    </div>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav hidden" id="mobile-nav">
+    <a href="#consult">Consult</a>
+    <a href="#how">How it works</a>
+    <a href="#languages">Languages</a>
+    <a href="#safety">Safety</a>
+    <a href="#faq">FAQ</a>
   </div>
 </header>
 
 <main>
-
-  <!-- ============ HERO / INTAKE SLIP ============ -->
-  <section class="intake-section wrap">
-    <div class="intake-intro">
-      <p class="eyebrow">Health information, in your words</p>
-      <h1>बोलिए. Speak, or type.<br>We'll help you understand it.</h1>
-      <p class="intake-sub">
-        Describe how you're feeling in any Indian language — by voice or by typing.
-        Sanjeevani transcribes it, translates it to English, and gives you a plain-language
-        explanation. It never replaces a doctor.
-      </p>
+  <!-- ============ HERO ============ -->
+  <section class="hero wrap">
+    <div class="hero-bg" aria-hidden="true">
+      <span class="orb orb-a"></span>
+      <span class="orb orb-b"></span>
+      <span class="orb orb-c"></span>
+      <svg class="hero-ecg" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
+        <path id="hero-ecg-path" d="M0,45 L180,45 L200,45 L210,20 L222,70 L234,30 L244,45 L420,45 L440,45 L450,22 L462,68 L474,32 L484,45 L660,45 L680,45 L690,24 L702,66 L714,34 L724,45 L1200,45" />
+      </svg>
     </div>
 
-    <div class="intake-slip" id="intake-slip">
-      <div class="slip-head">
-        <span class="slip-label">Patient intake</span>
-        <span class="slip-id" id="slip-timestamp">— · —</span>
-      </div>
-
-      <div class="mode-toggle" role="tablist" aria-label="Input mode">
-        <button class="mode-btn is-active" id="mode-speak" role="tab" aria-selected="true">Speak</button>
-        <button class="mode-btn" id="mode-type" role="tab" aria-selected="false">Type</button>
-      </div>
-
-      <div class="lang-row">
-        <label for="lang-select">Language</label>
-        <select id="lang-select">
-          <option value="auto">Auto-detect</option>
-        </select>
-      </div>
-
-      <div class="lang-row" style="margin-top: 12px;">
-        <label for="persona-select">I am a</label>
-        <select id="persona-select">
-          <option value="patient">Patient / Layperson</option>
-          <option value="asha_worker">Health Worker (ASHA)</option>
-        </select>
-      </div>
-
-      <!-- Speak panel -->
-      <div class="input-panel" id="panel-speak">
-        <button class="record-btn" id="record-btn" aria-pressed="false">
-          <span class="record-dot"></span>
-          <span class="record-label" id="record-label">Tap to speak</span>
-        </button>
-        <div class="record-waveform" id="record-waveform" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-pulse"></span> Live prototype · AI4Bharat + Gemma 4 + WHO grounding</p>
+        <h1>बोलिए.<br /><span class="gradient-text">Understand your health</span> in your own language.</h1>
+        <p class="hero-sub">
+          Speak or type how you feel in any of 13 Indian languages. Sanjeevani transcribes,
+          translates, triages gently, and explains in plain words — with WHO sources when they match.
+        </p>
+        <div class="hero-cta">
+          <a href="#consult" class="btn btn-primary btn-lg">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
+            Speak now
+          </a>
+          <button class="btn btn-ghost btn-lg" id="hero-try-text">
+            Try a sample question
+            <span aria-hidden="true">→</span>
+          </button>
         </div>
-        <audio id="audio-preview" controls class="audio-preview hidden"></audio>
+        <dl class="hero-stats">
+          <div><dt>13</dt><dd>languages<br />supported</dd></div>
+          <div><dt>3-step</dt><dd>listen → translate<br />→ explain</dd></div>
+          <div><dt>WHO</dt><dd>fact-sheet grounding<br />where matched</dd></div>
+        </dl>
+        <div class="trust-row">
+          <span class="trust-chip">✓ Not a diagnosis</span>
+          <span class="trust-chip">✓ ASHA-worker mode</span>
+          <span class="trust-chip">✓ Conversation memory</span>
+        </div>
       </div>
 
-      <!-- Type panel -->
-      <div class="input-panel hidden" id="panel-type">
-        <textarea id="text-input" placeholder="मुझे दो दिन से बुखार है… / Type how you're feeling…" rows="4"></textarea>
+      <div class="hero-card" aria-hidden="true">
+        <div class="hero-card-head">
+          <span class="hc-dot"></span><span class="hc-dot"></span><span class="hc-dot"></span>
+          <span class="hc-title">sanjeevani · live consult</span>
+        </div>
+        <div class="hero-card-body">
+          <div class="mini-bubble mini-user">मुझे दो दिन से बुखार और गले में दर्द है…</div>
+          <div class="mini-bubble mini-meta">Hindi detected · translated to English ✓</div>
+          <div class="mini-bubble mini-ai">
+            <span class="mini-triage triage-routine">Routine</span>
+            <strong>This sounds like it needs routine care.</strong>
+            <p>Rest, fluids, and monitor your temperature. See a doctor within 2–3 days if fever persists…</p>
+            <span class="mini-source">◉ Grounded in WHO fact sheet</span>
+          </div>
+        </div>
       </div>
-
-      <button class="submit-btn" id="submit-btn" disabled>Ask Sanjeevani</button>
-      <p class="slip-note">This tool gives general information only. In an emergency, call <strong>108</strong>.</p>
-      <p class="memory-note hidden" id="memory-note">Continuing your conversation — Sanjeevani remembers what you already asked.</p>
     </div>
   </section>
 
-  <!-- ============ RESULTS ============ -->
-  <section class="results-section wrap hidden" id="results-section">
-
-    <div class="emergency-banner hidden" id="emergency-banner">
-      <strong>⚠ This may be urgent.</strong>
-      <span id="emergency-text">Call 108 or go to the nearest hospital now.</span>
+  <!-- ============ CONSULT ============ -->
+  <section class="consult wrap" id="consult" aria-label="Consultation">
+    <div class="section-head">
+      <p class="eyebrow">Consultation</p>
+      <h2>Describe how you're feeling</h2>
+      <p class="section-sub">Your conversation stays in this browser session. Reset anytime.</p>
     </div>
 
-    <div class="ticket" id="ticket-heard">
-      <div class="ticket-tag">What we heard</div>
-      <p class="ticket-native" id="result-transcript" lang=""></p>
-      <div class="ticket-meta">
-        <span class="lang-chip" id="result-lang-chip">—</span>
+    <div class="consult-grid">
+      <!-- Input panel -->
+      <div class="panel input-panel-card" id="intake-slip">
+        <div class="panel-head">
+          <div>
+            <p class="panel-kicker">Patient intake</p>
+            <p class="panel-time mono" id="slip-timestamp">—</p>
+          </div>
+          <span class="session-chip mono" id="session-chip" title="Conversation session">new session</span>
+        </div>
+
+        <!-- Persona -->
+        <div class="field-group" role="group" aria-label="Who is asking">
+          <span class="field-label">I am a</span>
+          <div class="segmented" role="tablist" aria-label="Persona">
+            <button class="seg-btn is-active" id="persona-patient" role="tab" aria-selected="true" data-persona="patient">
+              <span class="seg-icon" aria-hidden="true">○</span> Patient
+            </button>
+            <button class="seg-btn" id="persona-asha" role="tab" aria-selected="false" data-persona="asha_worker">
+              <span class="seg-icon" aria-hidden="true">✚</span> ASHA worker
+            </button>
+          </div>
+          <p class="persona-hint" id="persona-hint">Plain, reassuring explanations with next steps.</p>
+        </div>
+
+        <!-- Language -->
+        <div class="field-group">
+          <label class="field-label" for="lang-select">Language</label>
+          <div class="lang-select-wrap">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
+            <select id="lang-select" aria-label="Choose language">
+              <option value="auto">✨ Auto-detect (recommended)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Mode tabs -->
+        <div class="tabs" role="tablist" aria-label="Input mode">
+          <button class="tab is-active" id="mode-speak" role="tab" aria-selected="true" aria-controls="panel-speak">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+            Speak
+          </button>
+          <button class="tab" id="mode-type" role="tab" aria-selected="false" aria-controls="panel-type">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+            Type
+          </button>
+          <span class="tabs-hint mono" id="rec-timer">00:00</span>
+        </div>
+
+        <!-- Speak panel -->
+        <div class="input-panel" id="panel-speak" role="tabpanel" aria-labelledby="mode-speak">
+          <button class="mic-btn" id="record-btn" aria-pressed="false" aria-label="Start recording">
+            <span class="mic-ring" aria-hidden="true"></span>
+            <span class="mic-core" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4"/></svg>
+            </span>
+            <span class="mic-label" id="record-label">Tap to speak</span>
+            <span class="mic-sub" id="record-sub">Up to ~60s · WebM / WAV</span>
+          </button>
+          <canvas class="visualizer" id="visualizer" width="600" height="64" aria-hidden="true"></canvas>
+          <audio id="audio-preview" controls class="audio-preview hidden" aria-label="Your recording preview"></audio>
+          <div class="row-between">
+            <button class="link-btn hidden" id="discard-audio">✕ Discard recording</button>
+            <span class="mono audio-size" id="audio-size"></span>
+          </div>
+        </div>
+
+        <!-- Type panel -->
+        <div class="input-panel hidden" id="panel-type" role="tabpanel" aria-labelledby="mode-type">
+          <textarea id="text-input" rows="5" maxlength="2000" placeholder="मुझे दो दिन से बुखार है… / Describe symptoms, duration, anything that worries you…" aria-label="Describe your symptoms"></textarea>
+          <div class="row-between">
+            <div class="sample-chips" aria-label="Sample questions">
+              <button class="chip" data-sample="मुझे दो दिन से बुखार और गले में दर्द है, क्या करूं?">बुखार + गला</button>
+              <button class="chip" data-sample="My child has had loose motions since yesterday. What should I watch for?">Child diarrhoea</button>
+              <button class="chip" data-sample="मधुमेह में खान-पान का ध्यान कैसे रखें?">मधुमेह आहार</button>
+            </div>
+            <span class="mono char-count"><span id="char-count">0</span>/2000</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block btn-lg" id="submit-btn" disabled>
+          <span id="submit-label">Ask Sanjeevani</span>
+          <kbd class="kbd" title="Press Ctrl+Enter to send">⌘⏎</kbd>
+        </button>
+        <p class="fine-print">General information only · Emergency? Call <a href="tel:108"><strong>108</strong></a></p>
+        <p class="memory-note hidden" id="memory-note">↩ Continuing this conversation — Sanjeevani remembers earlier turns.</p>
+      </div>
+
+      <!-- Thread panel -->
+      <div class="panel thread-panel">
+        <div class="panel-head">
+          <div>
+            <p class="panel-kicker">Consultation thread</p>
+            <p class="panel-time"><span id="turn-count">0</span> turns · <span id="thread-lang">no language yet</span></p>
+          </div>
+          <div class="thread-actions">
+            <button class="icon-btn" id="download-btn" title="Download summary (.txt)" aria-label="Download summary" disabled>
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            </button>
+            <button class="icon-btn" id="copy-all-btn" title="Copy last answer" aria-label="Copy last answer" disabled>
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button class="btn btn-ghost btn-sm" id="new-convo-btn">＋ New</button>
+          </div>
+        </div>
+
+        <div class="emergency-banner hidden" id="emergency-banner" role="alert">
+          <span class="eb-icon" aria-hidden="true">⚠</span>
+          <div>
+            <strong>This may be urgent.</strong>
+            <span id="emergency-text">Call 108 or go to the nearest hospital now.</span>
+          </div>
+          <a class="btn btn-emergency btn-sm" href="tel:108">Call 108</a>
+        </div>
+
+        <!-- Empty state -->
+        <div class="thread-empty" id="thread-empty">
+          <div class="empty-art" aria-hidden="true">
+            <svg viewBox="0 0 120 120" width="96" height="96"><circle cx="60" cy="60" r="46" fill="#e4eeec"/><circle cx="60" cy="60" r="34" fill="#fff"/><path d="M45 62h8l4-10 6 18 4-8h8" fill="none" stroke="#0b2b28" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="86" cy="34" r="12" fill="#f2b544"/><text x="86" y="42" text-anchor="middle" font-size="14" font-weight="bold">स</text></svg>
+          </div>
+          <h3>Your answers will appear here</h3>
+          <p>Record a voice note or type your symptoms on the left, then press <strong>Ask Sanjeevani</strong>. Each reply keeps transcript, translation, triage and sources together.</p>
+          <div class="empty-steps mono">
+            <span>1 · speak / type</span><span>2 · transcribe + translate</span><span>3 · plain-language answer</span>
+          </div>
+        </div>
+
+        <!-- Live loading skeleton -->
+        <div class="thread-loading hidden" id="thread-loading" aria-live="polite">
+          <div class="loading-steps mono" id="loading-steps">Listening…</div>
+          <div class="skeleton shimmer"></div>
+          <div class="skeleton short shimmer"></div>
+          <div class="skeleton shorter shimmer"></div>
+        </div>
+
+        <!-- Messages -->
+        <div class="thread" id="thread" aria-live="polite"></div>
+
+        <div class="thread-footer">
+          <button class="btn btn-ghost btn-sm" id="ask-again-btn">↓ Continue — ask a follow-up</button>
+          <span class="mono thread-hint">Ctrl + Enter to send</span>
+        </div>
       </div>
     </div>
 
-    <div class="ticket ticket-translated">
-      <div class="ticket-tag">Translated to English</div>
-      <p class="ticket-english" id="result-english">—</p>
-    </div>
-
-    <div class="ticket triage-ticket hidden" id="triage-ticket">
-      <div class="ticket-tag">Sanjeevani's assessment</div>
-      <div class="triage-row">
-        <span class="triage-badge" id="triage-badge">—</span>
-        <span class="confidence-note" id="confidence-note"></span>
-      </div>
-      <div class="assessment-row hidden" id="conditions-row">
-        <span class="row-label">Possible:</span>
-        <span id="conditions-list"></span>
-      </div>
-      <div class="assessment-row hidden" id="redflags-row">
-        <span class="row-label">Flagged:</span>
-        <span id="redflags-list"></span>
-      </div>
-      <p class="function-note hidden" id="function-note"></p>
-    </div>
-
-    <div class="note-card">
-      <div class="stamp" id="result-stamp">DRAFT<br><span>pending clinical source</span></div>
-      <div class="ticket-tag">Sanjeevani's response</div>
-      <p class="note-answer" id="result-answer">—</p>
-
-      <div class="note-sources hidden" id="note-sources">
-        <span class="sources-label">Source:</span>
-        <span id="sources-list"></span>
-      </div>
-
-
-      <p class="note-disclaimer">
-        General information only — not a diagnosis. Please confirm with a doctor, nurse,
-        or your nearest health worker. In an emergency, call <strong>108</strong>.
-      </p>
-    </div>
-
-    <div class="results-actions">
-      <button class="ask-again-btn" id="ask-again-btn">Continue this conversation</button>
-      <button class="new-convo-btn" id="new-convo-btn">Start a new conversation</button>
-    </div>
+    <div class="toast-stack" id="toast-stack" aria-live="assertive"></div>
   </section>
 
-  <div class="status-banner hidden" id="status-banner">
-    <div class="status-dot"></div>
-    <span id="status-text">Listening…</span>
-  </div>
-
-  <!-- ============ HOW IT WORKS ============ -->
-  <section class="how-section" id="how-it-works">
+  <!-- ============ HOW ============ -->
+  <section class="how" id="how">
     <div class="wrap">
-      <h2>How Sanjeevani gets from your voice to an answer</h2>
-      <ol class="how-steps">
-        <li>
-          <span class="step-index">1</span>
+      <div class="section-head light">
+        <p class="eyebrow light">Pipeline</p>
+        <h2>From your voice to a careful answer</h2>
+        <p class="section-sub light">Three real models, one cautious explainer — with memory across turns.</p>
+      </div>
+      <ol class="how-grid">
+        <li class="how-card">
+          <span class="step-num mono">01</span>
+          <span class="step-icon" aria-hidden="true">◉</span>
           <h3>Listen</h3>
-          <p>Your speech is transcribed in its original language using AI4Bharat's IndicConformer model, trained on the IndicVoices corpus.</p>
+          <p>IndicConformer (AI4Bharat, trained on IndicVoices) transcribes your speech in its original language — or auto-detects across Hindi, Bengali, Tamil, Telugu, Marathi.</p>
+          <span class="mono step-tag">asr · indic-conformer-600m</span>
         </li>
-        <li>
-          <span class="step-index">2</span>
+        <li class="how-card">
+          <span class="step-num mono">02</span>
+          <span class="step-icon" aria-hidden="true">⇄</span>
           <h3>Translate</h3>
-          <p>The transcript is translated into English with AI4Bharat's IndicTrans2, so nothing is lost in how the question was asked.</p>
+          <p>IndicTrans2 carries meaning into English and back, so the answer returns in the language you asked in — nothing lost in translation.</p>
+          <span class="mono step-tag">mt · indictrans2-dist-200m</span>
         </li>
-        <li>
-          <span class="step-index">3</span>
-          <h3>Answer</h3>
-          <p>Google's Gemma 4 (served via Ollama) drafts a cautious, plain-language response — grounded in a WHO fact sheet when your question matches one, and remembering earlier turns in the same conversation.</p>
+        <li class="how-card">
+          <span class="step-num mono">03</span>
+          <span class="step-icon" aria-hidden="true">✦</span>
+          <h3>Explain, carefully</h3>
+          <p>Gemma 4 (via Ollama) drafts a plain-language reply, grounded in a live WHO fact-sheet excerpt when your question matches — and remembers earlier turns.</p>
+          <span class="mono step-tag">llm · gemma4:cloud + WHO</span>
         </li>
       </ol>
     </div>
   </section>
 
-  <!-- ============ ABOUT / HONESTY SECTION ============ -->
-  <section class="about-section" id="about">
-    <div class="wrap about-grid">
+  <!-- ============ LANGUAGES ============ -->
+  <section class="wrap langs" id="languages">
+    <div class="section-head">
+      <p class="eyebrow">Coverage</p>
+      <h2>13 languages, one calm voice</h2>
+      <p class="section-sub">Auto-detect is on by default. Pick a language explicitly for faster, more accurate results.</p>
+    </div>
+    <div class="lang-grid" id="lang-grid" aria-live="polite">
+      <div class="skeleton short shimmer"></div>
+    </div>
+  </section>
+
+  <!-- ============ SAFETY ============ -->
+  <section class="wrap safety" id="safety">
+    <div class="safety-grid">
       <div>
-        <h2>What this build is — and isn't, yet</h2>
-        <p>
-          Sanjeevani is a prototype. The listening and translation are powered by real,
-          pretrained AI4Bharat models. When your question matches one of a small, curated
-          set of WHO fact sheets, the answer is grounded in a live excerpt from who.int and
-          says so, with a source link. Outside that set, the answer is drafted by Gemma 4
-          with extra caution and no specific source — that's why those answers keep the
-          "draft" stamp. Growing the WHO topic coverage (or connecting a different verified
-          clinical source) is the natural next step, not a hidden one.
-        </p>
-      </div>
-      <div class="about-credits">
-        <p class="credits-label">Built on</p>
-        <ul>
-          <li>AI4Bharat IndicConformer — speech recognition</li>
-          <li>AI4Bharat IndicTrans2 — translation, both directions</li>
-          <li>AI4Bharat Indic Parler-TTS — spoken answers</li>
-          <li>Google Gemma 4, served via Ollama Cloud — answer drafting</li>
-          <li>World Health Organization fact sheets — grounding, where matched</li>
+        <p class="eyebrow">Honesty first</p>
+        <h2>What this build is —<br />and isn't, yet</h2>
+        <p class="lede">Sanjeevani is a prototype. Speech and translation run on real pretrained AI4Bharat models. When your question matches a small curated set of WHO fact sheets, the answer is grounded in a live excerpt from <em>who.int</em> and says so with a link. Outside that set, Gemma 4 answers with extra caution and a visible <strong>DRAFT</strong> stamp. Growing WHO coverage is the roadmap — not a hidden caveat.</p>
+        <ul class="safety-list">
+          <li><strong>Never a diagnosis.</strong> Always confirm with a doctor, nurse, or ASHA worker.</li>
+          <li><strong>Emergencies first.</strong> Chest pain, breathing trouble, heavy bleeding, labour — call <a href="tel:108"><strong>108</strong></a>.</li>
+          <li><strong>Your audio stays in-session.</strong> Recordings are sent for transcription, not stored in your browser.</li>
         </ul>
+      </div>
+      <div class="credits-card">
+        <p class="mono credits-label">Built on</p>
+        <ul>
+          <li><span>IndicConformer</span><small>AI4Bharat · speech recognition</small></li>
+          <li><span>IndicTrans2</span><small>AI4Bharat · translation, both directions</small></li>
+          <li><span>Indic Parler-TTS</span><small>AI4Bharat · spoken answers</small></li>
+          <li><span>Gemma 4 via Ollama Cloud</span><small>Google · answer drafting + triage</small></li>
+          <li><span>WHO fact sheets</span><small>Grounding, where matched</small></li>
+        </ul>
+        <a class="btn btn-primary btn-block" href="#consult">Try a consultation</a>
       </div>
     </div>
   </section>
 
+  <!-- ============ FAQ ============ -->
+  <section class="wrap faq" id="faq">
+    <div class="section-head">
+      <p class="eyebrow">Questions</p>
+      <h2>Frequently asked</h2>
+    </div>
+    <div class="faq-list">
+      <details open>
+        <summary>Is Sanjeevani a doctor?</summary>
+        <p>No. It gives general health information in plain language. It does not diagnose, prescribe, or replace a clinician. In an emergency call 108.</p>
+      </details>
+      <details>
+        <summary>Which languages work best?</summary>
+        <p>Hindi, Bengali, Tamil, Telugu and Marathi are auto-detected for voice. All 13 listed languages work for typed questions, and answers are translated back into your language.</p>
+      </details>
+      <details>
+        <summary>What does the WHO SOURCED stamp mean?</summary>
+        <p>Your question matched a WHO fact sheet, so the answer quotes a live excerpt from who.int with a source link. DRAFT means no fact sheet matched and the answer is Gemma-generated with extra caution.</p>
+      </details>
+      <details>
+        <summary>What is ASHA-worker mode?</summary>
+        <p>A persona for community health workers: slightly more clinical wording, red-flag checklists, and referral guidance — still information only.</p>
+      </details>
+      <details>
+        <summary>Is my recording stored?</summary>
+        <p>No. Audio is sent to the backend for transcription and discarded; your browser keeps only the text thread for the current session until you start a new conversation.</p>
+      </details>
+    </div>
+  </section>
 </main>
 
 <footer class="site-footer">
-  <div class="wrap">
-    <p>Sanjeevani is a health-information prototype. It does not diagnose and is not a substitute for professional medical care. In an emergency, call <strong>108</strong>.</p>
+  <div class="wrap footer-grid">
+    <div>
+      <p class="brand-text">Sanjeevani</p>
+      <p class="footer-note">A health-information prototype. Not a diagnosis, not a substitute for professional care. Emergency? Call <a href="tel:108"><strong>108</strong></a>.</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href="#consult">Consult</a>
+      <a href="#how">How it works</a>
+      <a href="#languages">Languages</a>
+      <a href="#safety">Safety</a>
+    </nav>
+    <p class="mono footer-meta" id="footer-meta">session · new</p>
   </div>
 </footer>
 
-<script src="/assets/app.js"></script>
+<script src="/assets/app.js" defer></script>
 </body>
 </html>
